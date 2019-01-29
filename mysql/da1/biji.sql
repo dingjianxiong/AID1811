@@ -1,0 +1,311 @@
+-- 赵蒙蒙
+--   g-zhaomm@tedu.cn
+-- 	sublime 折行快捷键
+-- 		windows : ctrl+shift+[  / ctrl+shift+]
+-- 		Mac : command+option+[	/command+option+]
+-- 1. 数据库
+-- 	1. 数据库 ：存储数据的仓库
+-- 	2. 数据库软件分类 ：
+-- 		1. MySQL，Oracle，SQL Server，MongoDB，DB2，
+-- 			 MariaDB，Redis...
+-- 		2. 分类 ：
+-- 			根据数据的存储方式不同，划分为 ：
+-- 			1. 关系型数据库
+-- 				采用标准化的行和列构建二维表存储数据，
+-- 				表与表之间的逻辑关联称为关系。
+-- 				MySQL， Oracle， SQL Server，DB2，MariaDB
+-- 			2. 非关系型数据库	 （NoSQL-Not Only SQL）
+-- 				采用键值对的形式存储数据
+-- 				MongoDB，Redis（缓存）
+-- 		3. 如何选择
+-- 			1. 数据存储方式
+-- 			2. 是否开源 ：
+-- 					开源 ：MySQL MariaDB MongoDB
+-- 					闭源 ：Oracle DB2 ，SQL Server
+-- 			3. 是否跨平台 ：
+-- 					不跨平台 ： SQL Server
+-- 					跨平台 ：...
+-- 2. 数据库与数据仓库
+-- 	数据库 ：提供数据存储和数据操作的服务（DataBase）
+-- 	数据仓库 ：存储海量数据，提供数据分析与挖掘
+-- 						（Data WareHouse - DW/DWH）
+-- 3. MySQL 数据库
+-- 	1. 关系型数据库 ：
+-- 			1. 数据以二维表形式存储
+-- 			2. 表中的每一行，称为一条记录
+-- 			3. 表中的每一列，称为一个字段
+-- 			示例 ：
+-- 				1. 关系型数据库存储数据
+-- 					表1		学生信息表
+-- 								姓名	年龄	班级
+-- 								星矢	 20		一班
+-- 								水冰月 18		二班
+-- 					表2   班级信息表
+-- 								班级	班主任 人数
+-- 								一班	老王		30
+-- 								二班	老张		50
+-- 				2. 非关系数据库存储数据
+-- 						{"姓名":"星矢","年龄":"20"}
+-- 	2. 跨平台 ：
+-- 		 Ubuntu，windows, CentOS, Linux...
+-- 	3. 支持多种开发语言 ：
+-- 		 Python，Java，PHP...
+-- 4. MySQL 安装
+-- 	1. Ubuntu ：
+-- 			1. 安装服务端
+-- 				sudo apt-get install mysql-server
+-- 			2. 安装客户端
+-- 				sudo apt-get install mysql-client
+-- 			3. ubuntu 软件更新
+-- 				1. sudo apt-get update
+-- 					 访问源列表中的所有网址，读取软件列表，保存
+-- 					 到本地（/var/lib/apt/lists/）
+-- 				2. sudo apt-get upgrade
+-- 					 把本地已安装软件与刚下载的软件列表进行对比
+-- 					 如果当前软件版本低，则更新
+-- 				3. 修复依赖关系
+-- 					 sudo apt-get -f install
+-- 	2. windows :
+-- 		 下载安装包 xxx.msi
+-- 	3. Mac :
+-- 		 下载安装包 8.0
+-- 5. 启动和连接数据库
+-- 	1. 服务端启动 ：
+-- 		1. 查看MySQL状态
+-- 				sudo /etc/init.d/mysql status
+-- 			 连接服务端
+-- 			  sudo /etc/init.d/mysql start | stop | restart
+-- 	2. 连接客户端
+-- 		1. 命令格式 ：
+-- 			mysql -h主机地址 -u用户名 -p密码
+-- 			本机 ：
+-- 			mysql -hlocalhost -uroot -p123456
+-- 			mysql -uroot -p123456
+-- 6. MySQL 语句规范
+-- 	1. 每一条命令以;结束
+-- 	2. SQL命令不区分大小写
+-- 	3. 使用/c终止当前命令
+-- 7. 基本SQL命令
+-- 	1. 库的基本操作
+-- 		1. 查看已有库
+-- 			show databases;
+-- 		2. 创建数据库
+-- 			create database 库名; (默认字符集为Latin1)
+-- 			create database 库名 character set utf8;
+-- 			建库的同时指定字符集
+-- 		3. 查看创建库的语句（查看字符集）
+-- 			show create database 库名;
+-- 		4. 查看当前所在库
+-- 			select database();
+-- 		5. 使用已有库/切换数据库
+-- 			use 库名;
+-- 		6. 查看当前数据库中的所有表
+-- 			show tables;
+-- 		7. 删除数据库
+-- 			drop database 库名;
+-- 	2. 库名的命名规范
+-- 		1. 库名自定义，由数字，字母，下划线组成，禁止
+-- 			 与关键字冲突，禁止使用纯数字，尽量见名知意
+-- 		2. 为了区分库名和表名，可以在库名后添加db
+-- 				例: studb
+-- 		3. 库名和表名大小写敏感
+-- 				例: stuDB
+-- 	3. 练习
+-- 		1. 创建数据库testdb ,指定字符集为utf8
+-- 				create database testdb character set utf8;
+-- 		2. 进入数据库 testdb
+-- 				use testdb;
+-- 		3. 查看当前所在库
+-- 				select database();
+-- 		4. 创建数据库testdb2
+-- 				create database testdb2;
+-- 		5. 查看testdb2的字符集
+-- 				show create database testdb2;
+-- 		6. 删除testdb和testdb2
+-- 				drop database testdb;
+-- 				drop database testdb2;
+-- 	4. 表的基本操作
+-- 		1. 创建表
+-- 			create table 表名(字段名 数据类型,
+-- 			字段名 数据类型,
+-- 			字段名 数据类型);
+-- 		2. 查看表的字符集
+-- 			show create table 表名;
+-- 		3. 查看表结构（表中包含哪些字段）
+-- 			desc 表名;
+-- 		4. 删除表
+-- 			drop table 表名;
+-- 		5. 练习 :
+-- 			1. 创建库 pyDB,指定字符集为utf8
+-- 				 create database pyDB character set utf8;
+-- 			2. 在数据库中创建表，tab1,指定 id name age
+-- 				 三个字段（int char(10) int）
+-- 				 use pyDB;
+-- 				 create table tab1(id int,name char(10),age int);
+
+-- 			3. 查看表的字符集
+-- 				 show create table tab1;
+-- 			4. 查看表结构
+-- 				 desc tab1;
+-- 			5. 删除表，删除库
+-- 				 drop table tab1;
+-- 				 drop database pyDB;
+-- 	5. 表记录管理
+-- 		1. 插入记录
+-- 			insert into 表名 values (字段值,字段值),(字段值,字段值);
+-- 			指定字段插入数据：
+-- 			insert into 表名(字段1,字段2) values(字段值，字段值)；
+-- 		2. 查询记录
+-- 			select * from 表名; （查询所有数据）
+-- 			select 字段名,字段名 from 表名; (查询指定字段)
+-- 			指定查询条件
+-- 			select * from 表名 where 条件;
+-- 		3. 练习
+-- 			1. 查看所在库，查看已有库
+-- 			2. 创建新库，userdb
+-- 			3. 在新库中创建表 userInfo,设置字符集为utf8,
+-- 				 设置字段 id name age
+-- 			4. 查看表结构
+-- 				 desc userInfo;
+-- 			5. 在表中插入几条记录
+-- 			6. 在表中针对name,age两个字段插入两条数据
+-- 			7. 查询表中所有数据
+-- 			8. 查询表中所有姓名
+-- 			9. 查询表中所有年龄大于20的姓名信息
+-- 				 select name from userInfo where age>20;
+-- 	6. 更改数据库默认字符集
+-- 			1. 方法 ：修改数据库的配置文件
+-- 			2. 步骤 ：
+-- 				1. 获取root权限
+-- 						sudo -i
+-- 				2. cd /etc/mysql/mysql.conf.d/
+-- 				3. 文件备份(必须执行)
+-- 					 cp mysqld.cnf mysqld.cnf.bak
+-- 				4. 修改配置文件
+-- 						subl mysqld.cnf
+-- 						找 ：
+-- 							[mysqld]
+-- 						添加
+-- 							character_set_server = utf8
+-- 				5. 保存文件，重启服务
+-- 						sudo /etc/init.d/mysql restart
+-- 				Mac ：
+-- 					/etc/my.cnf
+-- 8. 客户端的连接与断开
+-- 		连接 ： mysql -h主机名 -u用户名 -p密码
+-- 					只有连接成功，才可以使用数据库服务，书写
+-- 					SQL语句
+-- 		断开 ：
+-- 				exit; | quit; | \q;
+-- 				断开与客户端的链接，并不会结束服务
+-- 				结束服务使用 ：
+-- 					sudo /etc/init.d/mysql stop
+-- 9. 数据类型
+-- 	1. 数值类型
+-- 		1. 整数
+-- 			1. int (大)整型 （占据4个字节）
+-- 				 取值范围 ：
+-- 				 无符号整型(unsigned) :0 ~ 2(32)-1
+-- 				 有符号整型(signed 默认为有符号) : -2(31)~2(31)-1
+-- 			2. tinyint 微小整型 （占据1个字节）
+-- 				 有符号整型 ：-128 ~ 127
+-- 				 无符号整型 ：0 ~ 255
+-- 				 例 ：
+-- 						age tinyint unsigned
+-- 			3. smallint 小整型 (占据2个字节)
+-- 			4. bigint		(极)大整型 (占据8个字节)
+-- 		2. 浮点数
+-- 			1. float （4个字节，最多表示小数点后7位）
+-- 					用法 ：
+-- 						字段名 float(m,n)
+-- 						m表示总位数，n表示小数位的位数
+-- 			2. double（8个字节，最多表示小数点后15位）
+-- 			3. decimal 最多表示到小数点后28位
+-- 					用法 ：
+-- 						decimal(m,n)
+-- 		3. 练习
+-- 			1. 创建库 studb,在库中创建表stuInfo,要求
+-- 					id   大整型（int）
+-- 					name 字符型 char(10)
+-- 					age  无符号微小整型
+-- 					height 浮点型表示，2位小数位，3位整数位
+-- 					weight 浮点型,3位整数位，3位小数位
+-- 					---------------------------------
+-- 					create table stuInfo(
+-- 					id int,
+-- 					name char(10),
+-- 					age tinyint unsigned,
+-- 					height float(5,2),
+-- 					weight decimal(6,3)
+-- 					);
+-- 			2. 查看表结构
+-- 			3. 查看字符集
+-- 			4. 插入一条完整记录
+-- 			5. 在 id name两个字段下插入两条数据
+-- 			6. 查询所有学生的id和姓名
+-- 		4. 浮点型使用注意 ：
+-- 			1. 如果插入的是整数数据，小数位会自动补0
+-- 			2. 如果插入数据的小数位超出指定位数，会自动
+-- 				 四舍五入
+-- 			3. 整数位超出限制，插入失败
+-- 	2. 字符类型
+-- 		1. 定长 char(长度)
+-- 			 长度取值范围 ：1 ~ 255
+-- 		2. 变长 varchar(长度)
+-- 			 长度取值范围 ：1 ~ 65535
+-- 			 定长与变长的区别 ：
+-- 			 定长 ：根据指定的长度固定分配存储空间
+-- 								char(10)
+-- 								存储'a'，也要分配10个字符的空间
+-- 							优点 ：效率高，速度快
+-- 							缺点 ：浪费存储空间
+
+-- 			 变长 ：在不超过指定长度的情况下，动态分配存储
+-- 							空间
+-- 								varchar(10)
+-- 								存储'a',动态根据数据的字符长度分配空间
+-- 							优点 ：节省存储空间
+-- 							缺点 ：效率比定长存储要低
+-- 			 共同点 ：
+-- 				 给出的长度，就是最大输入的字符数，超出则
+-- 				 无法存储
+-- 				 例 ：
+-- 						name varchar(10)
+-- 						"wangzhaojun" 超出无法存储
+-- 		3. 长文本存储
+-- 				text
+-- 				longtext (4G)
+-- 		4. 二进制数据存储
+-- 				blob
+-- 				longblob (4G)
+-- 		5. 数值类型的显示宽度与字符型的最大字符数
+-- 				int(11) 显示宽度与存储空间无关
+-- 					借助zerofill关键字，查看整型的显示宽度
+-- 					例 ：
+-- 						id int(5) zerofill
+-- 						存储数据 ：
+-- 						insert ... (5)  ->显示00005
+-- 						insert ... (1234567)  -> 显示1234567
+-- 						insert ... (123456789012345)：
+-- 							error : 超过了当前数据类型的表示范围
+-- 							int unsigned : 2(32) - 1 (42亿多)
+
+-- 				char(10)设置数据的存储空间，超出则无法存储
+-- 	3. 枚举类型
+-- 			1. enum 类型 （表示单选）
+-- 				枚举是一个字符串对象，可以将一些
+-- 				不重复的字符串存储成一个预定义的集合，字段存储
+-- 				数据时，必须从集合中选择，不在集合范围的都是非法值
+-- 				例 ：
+-- 					gender enum('男','女','保密');
+-- 					枚举类型会自动为集合中的字符串选项分配下标
+-- 					查询时，可根据下标表示对应的值
+-- 					select * from ...where gender="男";
+-- 					等价于
+-- 					select * from ...where gender=1;
+-- 			2. set 类型 （实现多选）
+-- 				特殊的枚举类型，用法与enum一致，提供字符串类型
+-- 				的集合（选项）
+-- 				例 ：
+-- 					sportcourse set('篮球',"足球");
+-- 					inert ... values(1,"zhangsan","篮球,足球");

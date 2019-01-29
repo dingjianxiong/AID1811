@@ -1,0 +1,111 @@
+多线程并发
+    基于threading模块
+        １、创建套接字，绑定监听
+        ２、接收客户端连接
+        ３、创建新的线程处理客户端请求
+        ４、主线程继续等待其他客户端连接
+        ５、当客户端退出则线程退出
+信号处理僵尸：
+    １、导入信号处理模块，import signal
+    ２、在父进程中运行
+        signal.signal(signal.SIGDCHLD,signal,SIG_IGN)
+        这样该父进程再有子进程退出则交由系统回收
+
+集成模块完成多进程多线程socket并发
+    import socketserver
+    功能：通过模块提供的不同类的组合完成多进程/多线程，tcp/udp的并发组合
+
+    DatagramRequestHandler 处理数据报套接字请求
+    StreamRequestHandler    处理流式套接字请求
+
+    UDPServer   构建udp服务端程序
+    TCPServer   构建tcp服务端程序
+    
+    ForkingMixIn    创建多进程并发
+    ForkingTCPServer    ForkingMixIn  +  TCPServer
+    ForkingUDPServer    ForkingMixIn  +   UDPServer
+    
+    ThreadingMixIn      创建多线程并发
+    ThreadingTCPServer  ThreadingMixIn　　＋　　TCPServer
+    ThreadingUDPServer　　ThreadingMixIn　　＋　　UDPServer
+
+使用步骤：
+    １、创建服务器类，通过选择TCPServer或者UDPServer确定服务器类型，
+        多进程或者多线程确定并发类型。
+    ２、创建请求处理类，根据服务器类型，选择继承流式套接字处理类，还是
+        数据报套接字处理类
+    ３、通过服务器类创建服务器对象，并绑定请求处理类
+    ４、通过serve_forever()接口启动服务
+
+HTTPSserver v2.0
+    功能：
+        １、接收客户端http请求
+        ２、解析客户端请求
+        ３、组织数据，以http响应的格式返回
+        ４、将数据发送给浏览器
+    升级：
+        １、采用多线程并发，满足多个客户端同时请求
+        ２、基本的请求解析，根据具体请求返回内容
+        ３、可以为前端提供一些数据
+        ４、将整体功能封装为一个类，提供给用户使用
+    技术点：
+        １、使用socket TCP
+        ２、使用多线程作为并发
+        ３、http协议的请求响应格式
+            http请求：
+                请求行　GET /abc.html   HTTP/1.1
+                请求头
+                空行
+                请求体
+            http响应：
+                响应行　200   404    500
+                响应头
+                空行
+                响应体　具体内容（网页或者数据）
+协程基础(处理IO)
+    定义：纤程，微线程。是为非抢占式多任务产生子程序的计算机程序组件。协程允许不同入口点在
+                不同个位置暂停或者开始，简单来说，协程就是可以暂停执行的函数
+    yield(生成器)是python实现协程的基本关键字
+
+    协程原理：记录一个函数的　上下文栈区，协程调度时，将记录的上下文栈保存起来，
+            在切换回来时进行调取，回复原有的执行内容，从上一次执行的位置继续执行
+    协程优点：
+        １、可以同时处理多个任务
+        ２、协程是一个单线程程序，消耗资源较少，协程无需切换的开销，也无需同步互斥操作
+    协程缺点：
+        １、无法利用计算机多核资源进行处理
+
+    greenlet
+        安装：sudo pip3 install greenlet
+        greenlet.greenlet(fun)
+        功能：创建协程对象
+        参数：协程函数
+        返回：协程对象
+        g.switch()
+        功能：选择要执行的协程函数
+    gevent
+        安装：sudo pip3 install gevent
+        使用步骤：
+            １、将协程事件封装为函数
+            ２、生成协程对象
+                gevent.spawn(func,argv)
+                功能：生成协程对象
+                参数：func 协程函数
+                    argv  不定参　　给func按照位置传参
+                    
+                返回：协程对象
+            ３、协程回收
+                gevent.joinall(list,[timeout])
+                功能：阻塞等待回收协程
+                参数：list　列表　　放入要回收的协程对象
+                    timeout 超时时间
+                gevent.sleep():gevent阻塞，可以使协程跳转
+                特点：
+                    １、无论有多少协程运行，同一时刻只会运行一个
+                    ２、协程不会阻碍主进程的持续运行，除非遇到gevent阻塞
+
+作业：
+    １、整理进程线程网络代码
+    ２、复习mysql使用
+    ３、自己写聊天室、ftp文件服务程序
+

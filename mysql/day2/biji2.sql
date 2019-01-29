@@ -1,0 +1,316 @@
+-- 回顾day01
+-- 1. MySQL数据库的特点：
+-- 	关系型数据库，跨平台，支持多种开发语言
+-- 2. 启动和连接数据库
+-- 	sudo /etc/init.d/mysql start | restart | stop | status
+-- 	mysql -hlocalhost -uroot -p123456
+-- 3. SQL 语句
+-- 	1. 库的管理
+-- 		show databases;
+-- 		select database();
+-- 		create database 库名;
+-- 		use 库名;
+-- 		show tables;
+-- 		drop database 库名;
+-- 	2. 表的管理
+-- 		use 库名;
+-- 		create table 表名(字段名 数据类型,字段名 数据类型);
+-- 		insert into 表名 values (行记录),();
+-- 		insert into 表名(字段1,字段2) values(字段值1，字段值2);
+-- 		select * from 表名;
+-- 		select 字段名 from 表名;
+-- 		select * from 表名 where 条件;
+-- 		desc 表名;
+-- 		drop table 表名;
+-- 4. 数据类型
+-- 	1. 数值类型
+-- 		整型 ：
+-- 			int tinyint bigint smallint
+-- 			有无符号 ：signed（默认有符号）unsigned（无符号）
+-- 		浮点型 ：
+-- 			float double decimal （有符号）
+-- 			使用 ：
+-- 				float(m,n) m表示总位数 n表示小数位位数
+-- 	2. 字符型
+-- 		char(m) varchar(m) text blob
+-- 		定长 char(m) : 根据指定的最大字符数，固定分配存储
+-- 									 空间，速度快，效率高，浪费空间
+-- 		变长 varchar(m) : 在不超过最大字符数的情况下，动态
+-- 										分配存储空间，节省空间，效率低
+-- 		整型的显示宽度与字符的最大个数:
+-- 			int(11) char(10)
+-- 			11 : 表示整型的显示宽度，跟存储空间无关，跟
+-- 					 数据类型的取值范围有关
+-- 			10 ：表示存储空间，超出无法存入
+-- 	3. 枚举类型
+-- 		单选 ：使用枚举定义字符串集合，作为选项，执行数据
+-- 					 存储时必须从给定的集合中选取
+-- 		多选 ：使用集合定义字符串
+-- 					  course set('1','2','3')
+-- 						values ('1,2,3')
+-- --------------------------------------------
+-- day02
+-- 1. MySQL 数据类型
+-- 	1. 数值类型
+-- 	2. 字符型
+-- 	3. 枚举与集合
+-- 	4. 日期与时间
+-- 		1. date : 表示日期 "YYYY-MM-DD"
+-- 		2. time : 表示时间 "hh:mm:ss"
+-- 		3. datetime : 表示日期时间 "YYYY-MM-DD hh:mm:ss"
+-- 		4. timestamp : 表示日期时间 "YYYY-MM-DD hh:mm:ss"
+-- 		注意 ：
+-- 			日期时间的表示方法 ：
+-- 			使用字符串表示，格式可采用 "2011/11/11 11:11:11"
+-- 			"2011-11-11 11:11:11"
+-- 			"20181201103050"
+-- 		日期时间函数 ：
+-- 			1. now() 返回当前系统时间
+-- 			2. curdate() 返回当前日期
+-- 			3. curtime() 返回当前时间
+-- 			4. year(date) 根据给定的日期获取年份信息
+-- 			5. date('20111010121212') 获取日期信息
+-- 			6. time('20111010121212') 获取时间信息
+-- 		练习 ：
+-- 			在表中插入若干条记录
+-- 			查询2018年8月30日中有哪些用户充值了
+-- 				 select id,name,czTime from info2 
+-- 				 where date(czTime)='20180830';
+-- 			查询2018年8月份的充值信息
+-- 					8月份 20180801 - 20180831
+-- 					where date(czTime)>="20180801" and 
+-- 								date(czTime)<="20180831" 
+-- 			查询2018年8月30日10:00:00~15:00:00之间的充值记录
+-- 				select * from info2 where 
+-- 				date(czTime)="20180830"
+-- 				and time(czTime)>="100000"
+-- 				and time(czTime)<="150000";
+-- 				方法2 ：
+-- 				2018-08-30 10:00:00 ~ 2018-08-30 15:00:00
+-- 				select * from info2 where 
+-- 				czTime>="20180830100000"
+-- 				and czTime<="20180830150000";
+-- 		日期时间运算
+-- 			1. 语法格式 ：
+-- 				select * from info2 where 字段名 
+-- 				运算符(时间-interval 时间间隔 单位)
+-- 				时间间隔 单位 ：
+-- 					1 day | 1 month | 1 year
+-- 					1 hour | 1 minute
+-- 				正值表示过去的时间点 1 day 一天前
+-- 				负值表示未来的时间点 -1 day 一天后
+-- 			2. 练习 ：
+-- 				1. 查询一天以内的充值记录
+-- 					select * from info2 where
+-- 					czTime>(now()-interval 1 day); 
+-- 					类似于比较运算
+-- 					czTime > "20181129111111"
+-- 				2. 查询一年前所有的充值记录
+-- 					where czTime<"20171129111111";
+-- 					where czTime<(now()-interval 1 year);				
+-- 				3. 查询1天前，3天内的充值记录
+-- 					where czTime < (now()-interval 1 day)
+-- 					and czTime > (now()-interval 3 day);
+-- 				4. 查询20171010 一年前的所有充值记录
+-- 					where czTime < 
+-- 					("20171010200000"-interval 1 year);
+-- 					类似于
+-- 					czTime < "20161010200000"
+-- 2. 修改表字段（修改结构）
+-- 	1. alter table 表名 执行操作；
+-- 	2. 添加字段 （add）
+-- 		 alter table 表名 add 字段名 数据类型;
+-- 		 alter table 表名 add 字段名 数据类型 first;
+-- 		 alter table 表名 add 字段名 数据类型 after 字段名;
+-- 	3. 移除字段 (drop)
+-- 		 alter table 表名 drop 字段名;
+-- 	4. 修改数据类型 (modify)
+-- 		 alter table 表名 modify 字段名 新数据类型;
+-- 	5. 表的重命名
+-- 		 alter table 表名 rename 新表名
+-- 		 练习 ：
+-- 			修改age字段的数据类型为tinyint 无符号
+-- 			重命名表
+-- 			删除身高字段
+-- 3. 修改表记录（修改表中数据）
+-- 	1. 删除表记录
+-- 		delete from 表名 where 条件;
+-- 		注意 ：
+-- 			where 条件可以省略，delete from 表名;
+-- 			表示清空表记录
+-- 	2. 更新操作
+-- 		update 表名 set 字段名=值,字段名=值 where 条件;
+-- 		注意 ：
+-- 			更新操作中，where条件必须写，如果省略，会
+-- 			将表中所有记录都进行修改
+-- 	练习 ：
+-- 		基于hero表操作
+-- 		1. 查询所有蜀国人的信息
+-- 				select * from hero where country = '蜀国';
+-- 		2. 查询所有女英雄的姓名，国家
+-- 				select name,country from hero where sex='女';
+
+-- 		3. 将id=2的记录中，修改为 典韦 男 魏国
+-- 				update hero set name='典韦',sex='男',country='魏国' where id=2;
+
+-- 		4. 删除所有蜀国英雄
+-- 				delete from hero where country="蜀国";
+				
+-- 		5. 将貂蝉的国家信息改为魏国
+-- 				update hero set country="魏国" where name='貂蝉';
+
+-- 		7. 删除表记录
+-- 				delete from hero;
+-- 4. 运算符
+-- 	1. 比较运算符
+-- 			> >= < <= = !=
+-- 			练习（sanguo表）
+-- 				1. 查询攻击力高于150的英雄姓名及攻击值
+-- 						select name,gongji from sanguo where gongji > 150;
+
+-- 				2. 将表中赵云的攻击力设置为360，防御值99
+-- 						update sanguo set gongji=360,fangyu=99 where name="赵云";
+-- 	2. 逻辑运算符
+-- 			1. and 与
+-- 					连接两个条件，要求同时成立
+-- 			2. or	 或
+-- 					连接条件，表示任意一个条件成立都可以
+-- 			练习 ：
+-- 				1. 找出攻击值高于200的蜀国英雄的姓名
+-- 					 select name from sanguo where gongji>200
+-- 					 and country="蜀国";
+-- 				2. 将吴国英雄中攻击值为110的数据，修改为
+-- 						100的攻击力，50的防御力
+-- 					 update sanguo set gongji=100,fangyu=50
+-- 					 where country="吴国" and gongji=110;
+-- 				3. 查询蜀国和魏国的英雄信息
+-- 					 select * from sanguo where 
+-- 					 country="蜀国" or country="魏国";
+-- 					 或 ：
+-- 					 select * from sanguo where country != '吴国';
+-- 	3. 范围内查找
+-- 			1. between 值1 and 值2
+-- 			2. where 字段名 in (值1,值2)
+-- 				 查找字段值在给定集合范围内的数据
+-- 			3. where 字段名 not in (值1,值2)
+-- 				 查找字段值不在给定集合范围内的数据
+-- 			练习 ：
+-- 				1. 查找攻击值在100到200之间的英雄信息
+-- 						select * from sanguo where gongji
+-- 						between 100 and 200;
+-- 				2. 查找攻击值在100到200之间蜀国英雄信息
+-- 						select * from sanguo where gongji
+-- 						between 100 and 200 and country="蜀国";
+-- 				3. 查找蜀国和吴国以外,其他国家中女英雄的信息
+-- 						select * from sanguo where 
+-- 						country not in ('蜀国','吴国') 
+-- 						and sex='女';
+-- 				4. 查找id=1,3,5的蜀国英雄信息和貂蝉的信息
+-- 						select * from sanguo where
+-- 						(id in (1,3,5) and country="蜀国")
+-- 						or name="貂蝉";
+-- 	4. 匹配空与非空
+-- 			注意 ：
+-- 				null 是特殊的值类型，表示空，
+-- 				使用比较运算符 = 查询时,返回空的数据,查询无果
+-- 				区分 ：
+-- 					null : 关键字，值类型
+-- 					'null' : 字符串,普通字符串
+-- 			1. 匹配 null 
+-- 					where 字段 is null
+-- 			2. 匹配非空
+-- 					where 字段 is not null
+-- 			练习 ：
+-- 				1. 查询name为null的英雄信息
+-- 						select * from sanguo where name is null; 
+-- 				2. 查询name为''的英雄信息
+-- 						select * from sanguo where name='';
+-- 			3. 空字符串
+-- 				空字符串，指没有任何有效显示字符的字符串
+-- 				例 ：
+-- 					'' 等价于 '    '
+-- 					都是空字符串，空格不计入有效字符
+-- 	5. 模糊查找
+-- 			1. 语法
+-- 					where 字段名 like 表达式
+-- 			2. 表达式语法 ：
+-- 					1. _ : 表示匹配单个字符
+-- 					2. % : 表示匹配0个或多个字符
+-- 					练习 ：
+-- 						1. 匹配姓名为三个字的英雄信息
+-- 								select * from sanguo where name like '___';
+-- 						2. 匹配姓名至少是两个字的英雄信息
+-- 								select * from sanguo where name like '__%';
+-- 					注意 :
+-- 						null 空类型不会被匹配出来，只能通过
+-- 						is null / is not null 匹配
+-- 						空字符串可以通过 '%' 模糊匹配
+-- 	6. SQL查询操作
+-- 		1. 总结（书写顺序，从上至下；执行顺序，看序号）
+-- 				3. select 聚合函数 from 表名
+-- 				1. where 条件
+-- 				2. group by...
+-- 				4. having ...
+-- 				5. order by...
+-- 				6. limit 
+-- 		2. order by..
+-- 			对查询结果进行排序
+-- 			语法 ：
+-- 				where 条件 order by 字段名 ASC/DESC
+-- 				asc : 升序排列（默认排序方式）
+-- 				desc : 降序排列
+-- 			练习 ：
+-- 				1. 将英雄按照防御值从高到低排列
+-- 						select * from sanguo order by fangyu desc;
+-- 				2. 将蜀国英雄按攻击值从高到低排列
+-- 						select * from sanguo where country="蜀国"
+-- 						order by gongji desc;
+-- 				3. 将魏蜀两国英雄中名字为三个字的，按照防御值
+-- 					 升序排列
+-- 						select * from sanguo where
+-- 						country in ('魏国','蜀国') and
+-- 						name like '___' order by fangyu;
+-- 		3. limit
+-- 				分页查询 ：限制查询结果的显示数量和显示位置
+-- 				语法 ：
+-- 					1. limit 永远放在SQL语句的最后书写
+-- 					2. limit n ; 显示n条数据
+-- 					3. limit m,n ;
+-- 							表示从第m+1条数据开始显示
+-- 							显示n条
+-- 							例 ：
+-- 								limit 2,3 显示第3,4 5条数据
+-- 					练习 ：
+-- 						1. 在蜀国英雄中，查找防御值倒数第二名
+-- 								至第四名的英雄记录
+-- 								select * from sanguo where 
+-- 								country="蜀国" 
+-- 								order by fangyu
+-- 								limit 1,3;
+-- 						2. 在蜀国英雄中，查找攻击值前3名且姓名
+-- 							 不为null的英雄的姓名，攻击值
+-- 								select name,gongji from sanguo where
+-- 								country="蜀国" and
+-- 								name is not null
+-- 								order by gongji desc
+-- 								limit 3;
+-- 						3. 已知每页显示5条数据，显示第四页的数据
+-- 								1-5 6-10 11-15 16-20
+-- 								limit 15,5
+-- 		4. 聚合函数
+-- 			 1. 对指定字段中的数据进行二次处理
+-- 			 2. 分类 ：
+-- 					avg(字段) ：求平均值
+-- 					max(字段) ：求最大值
+-- 					min(字段) ：求最小值
+-- 					sum(字段) ：求和
+-- 					count(字段) ：统计当前字段中记录的条数
+-- 			 3. 示例
+-- 					1. 获取最大的攻击值
+-- 						 select max(gongji) from sanguo;
+-- 					2. 统计 id,name 两个字段中分别有多少条记录
+-- 						 select count(id),count(name) from sanguo;
+-- 						 多个聚合函数之间使用逗号隔开
+-- 						 select count(*) from sanguo;
+-- 					3. 统计蜀国英雄中攻击值>200的英雄数量
+					

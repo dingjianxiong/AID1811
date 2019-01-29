@@ -1,0 +1,217 @@
+Day04回顾
+1、主键 && 自增长(PRI,不能重复,不能为NULL)
+  1、创建
+    id int primary key auto_increment,
+    alter table 表名 add primary key(id);
+    ## 已有表中添加自增长属性 ##
+    alter table 表名 modify id int auto_increment;
+  2、删除
+    1、alter table 表名 modify id int;
+    2、alter table 表名 drop primary key;
+  3、指定起始值
+    1、create table (...)auto_increment=1000;
+    2、alter table 表名 auto_increment=1000;
+2、外键
+  1、使用规则
+    1、数据类型要一致
+    2、主表被参考字段必须为KEY的一种 ：PRI
+  2、语法格式
+    foreign key(从表字段名) references 
+    主表(主表字段名)
+    on delete 级联动作
+    on update 级联动作
+  3、级联动作
+    1、cascade ：删除、更新(被参考字段)同步
+    2、set null：删除、更新,从表该字段值为NULL
+    3、restrict：不让主表操作
+  4、删除
+    1、show create table 表名;
+    2、alter table 表名 drop foreign key 外键名;
+3、锁 ：解决客户端并发访问的冲突问题
+  1、锁类型 ：读锁、写锁
+  2、锁粒度 ：行级锁(InnoDB)、表级锁(MyISAM)
+4、存储引擎 ：处理表的处理器
+  mysql> show engines;
+  mysql> show create table 表名;
+  mysql> create table 表名(...)engine=MyISAM;
+  mysql> alter table 表名 engine=InnoDB;
+5、常见存储引擎
+  1、InnoDB ：支持外键、行级锁、事务、共享表空间
+  2、MyISAM ：支持表级锁、独享表空间
+  3、MEMORY ：表记录存储在内存中
+  4、如果选择
+    查询操作多 ：MyISAM
+    更新操作多 ：InnoDB
+6、数据导入
+  1、拷贝文件 ：/var/lib/mysql-files
+  2、创建对应表
+  3、执行导入语句
+    load data infile "/var/lib/...."
+    into table 表名
+    fields terminated by "分隔符"
+    lines terminated by "\n"
+  4、修改权限
+    chmod 644 文件名
+    chmod 666 文件名
+7、数据导出
+  select ... from 表名 where 条件
+  into outfile "/var/lib/..."
+  fields terminated by "分隔符"
+  lines terminated by "\n"
+8、数据备份和恢复
+  1、备份 ：mysqldump -u用户名 -p 源库名 > XXX.sql
+     --all-databases
+     库名
+     -B 库1 库2 库3
+     库1 表1 表2 表3
+  2、恢复 ：mysql -u用户名 -p 目标库名 < XXX.sql
+     --one-database
+     1、先创建空库再恢复
+     2、库中新增表不会删除,新增记录会被覆盖
+9、导入/etc/passwd文件到数据库
+  1、拷贝文件
+    sudo cp /etc/passwd /var/lib/mysql-files/
+  2、创建表
+    tarena:x:1000:1000:tare:/home/tarena:/bin/bash
+    create table userinfo(
+    username varchar(30),
+    password char(1),
+    uid int,
+    gid int,
+    comment varchar(50),
+    homedir varchar(50),
+    shell varchar(50)
+    )charset=utf8;
+  3、执行导入语句
+    load data infile "/var/lib/mysql-files/passwd"
+    into table userinfo
+    fields terminated by ":"
+    lines terminated by "\n";
+  4、添加id字段,主键自增长,显示宽度为3,位数不够用0填充
+    alter table userinfo add id int(3) zerofill primary key auto_increment first;
+********************************************
+Day05笔记
+1、MySQL用户账户管理
+  1、开启MySQL远程连接
+    1、sudo -i
+    2、cd /etc/mysql/mysql.conf.d/
+    3、vi mysqld.cnf
+      #bind-address = 127.0.0.1
+      注释掉此行
+    4、/etc/init.d/mysql restart
+  2、添加授权用户
+    1、用root用户登录MySQL
+      mysql -uroot -p123456
+    2、授权
+      grant 权限列表 on 库.表 to "用户名"@"%" identified by "密码" with grant option;
+
+      权限列表 ：all privileges、select、update
+      库名.表名：*.* 、库名.*
+    3、添加授权用户tiger,密码123,对所有库的所有表有所有权限
+      grant all privileges on *.* to "tiger"@"%" identified by "123" with grant option; 
+    4、添加授权用户rabbit,密码123,对db4库有查询权限
+      grant select on db4.* to "rabbit"@"%" identified by "123" with grant option;
+2、事务和事务回滚
+  1、定义 ：一件事从开始发生到结束的整个过程
+  2、事务基本操作
+    1、开启事务 ：mysql>begin;
+    2、终止事务 ：mysql>commit; 或者 rollback;
+  3、示例
+    1、背景 ：你到银行自动取款机上给你朋友转5000
+    2、建表(bankUser)
+      create table bankUser(
+      name varchar(20),
+      money decimal(20,2)
+      );
+      insert into bankUser values("有钱人",20000),("穷人",2);
+    3、转账过程
+      点击转账按钮
+      mysql>begin;
+      mysql>update bankUser set money=money+5000 where name="有钱人";
+      mysql>update bankUser set money=money-5000 where name="穷人";
+      mysql>commit; 或者 rollback;
+    4、注意
+      事务机制只针对于表记录操作(增删改)有效,对于库和表操作无效
+3、与Python交互
+  1、python3 ：pymysql(模块名)
+     python2 ：MySQLdb(模块名)
+  2、安装
+    1、在线 ：sudo pip3 install pymysql
+              sudo pip install mysql-python
+    2、离线 ：pymysql-0.9.1.tar.gz
+      $ tar -xf pymysql-0.9.1.tar.gz
+      $ cd pymysql0.9.1
+      $ sudo python3 setup.py install
+  3、pymysql使用流程
+    1、数据库连接对象 ：db = pymysql.connect(...)
+    2、游标对象 ：cur = db.cursor()
+    3、执行命令 ：cur.execute('SQL命令')
+    4、提交     ：db.commit()
+    5、关闭游标 ：cur.close()
+    6、断开连接 ：db.close()
+  4、pymysql.connect()参数
+    1、host ：主机地址  host="localhost"
+    2、user ：用户名    user="root"
+    3、password ：密码  password="123456"
+    4、database ：库名  database="db5"
+    5、charset  ：字符集charset="utf8"
+    6、port     ：端口  port=3306
+  5、数据库连接对象(db)方法
+    1、db.cursor() ：创建游标对象
+    2、db.commit() ：提交到数据库执行
+    3、db.rollback()：回滚
+    4、db.close()  ：断开与数据库连接
+  6、游标对象(cur)的方法
+    1、cur.execute('SQL命令') : 执行sql命令
+       cur.execute(sql命令,[]) : 
+         sql命令中所有占位都用 %s ,不用 % 补位
+	 第二个参数一定要为列表
+    2、cur.close()     : 关闭游标对象
+    3、cur.fetchone()  : 取1条,元组()
+    4、cur.fetchmany(n): 取n条,大元组套小元组((),)
+    5、cur.fetchall()  : 取所有查询结果,大元组套小元组((),(),(),(),)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1、创建库 db5 utf8
+  create database db5 charset utf8;
+  use db5;
+2、创建表 t1
+  create table t1(
+  id int,
+  name varchar(20),
+  score float(5,2)
+  );
+  insert into t1 values
+  (1,"李白",80),(2,"杜甫",90),(3,"白居易",88);
+
+
+
+
+
+
+
+
+
+
+
+
+

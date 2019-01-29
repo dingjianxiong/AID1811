@@ -1,0 +1,4 @@
+abcdefghijkomnopqrstuw还号爱仕达群奥无完全委屈二多群哇二多安尔碘#客户端ｕｄｐ
+from socket import *
+sockfd=socket(AF_INET,SOCK_DGRAM)
+sockfd

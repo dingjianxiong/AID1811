@@ -1,0 +1,182 @@
+分组聚合$group
+    统计求和：$sum
+    统计平均数：$avg
+        例如：按照性别分组求每组年龄的平均值
+            db.class0.aggregate({$group:{_id:'$gender',avg:{$avg:'$age'}}})
+    求最大值：$max
+        例如：按照性别分组求每组年龄的最大值
+            db.class0.aggregate({$group:{_id:'$gender',max:{$max:'$age'}}})
+    求最小值：$min
+        例如：按照性别分组求每组年龄的最小值
+            db.class0.aggregate({$group:{_id:'$gender',min:{$min:'$age'}}})
+    求第一个数：$first
+        例如：按照性别分组求每组年龄的第一个数
+            db.class0.aggregate({$group:{_id:'$gender',first:{$first:'$age'}}})
+    求最后一个数：$last
+        例如：按照性别分组求每组年龄的最后一个数
+            db.class0.aggregate({$group:{_id:'$gender',last:{$last:'$age'}}})
+$project:格式化显示文档内容
+    功能：显示自己想要的内容，可以修改显示的域名
+    参数：写法同find的field参数
+        例如：不显示_id，显示name、age两个域
+            db.class0.aggregate({$project:{_id:0,name:1,age:1}})
+$match:筛选数据
+    *match值的写法与find的query参数相同
+    例如：查找年龄大于２０的文档
+    db.class0.aggregate({$match:{age:{$gt:20}}})
+$limit:显示前几条文档
+    例如：显示前三条文档
+        db.class0.aggregate({$limit:3)
+$skip:跳过前几条文档
+    例如：跳过前三条文档
+        db.class0.aggregate({$skip:3})
+$sort:对所选的域排序
+    例如：对年龄进行排序
+        db.class0.aggregate({$sort:{age:1}})
+
+
+聚合管道
+    aggregate([{聚合１}，{聚合１}....])
+    指将多个聚合操作合并在一起，即上一个聚合的结果交给下一个聚合操作继续操作，
+        最终完成一个较复杂的功能
+    例如：对年龄排序，不显示id
+        db.class0.aggregate([{$sort:{age:1}},{$project:{_id:0}}])
+    １、将所有男生按照年龄排序，不显示_id
+        db.class0.aggregate([{$match:{gender:'m'}},{$sort:{age:1}},{$project:{_id:0}}])
+    ２、统计一下班级中有无重名同学
+        db.class0.aggregate([{$group:{_id:'$name',num:{$sum:1}}},{$match:{num:{$gt:1}}}])
+
+固定集合：
+    指的是mongodb中创建的固定大小的集合
+    特点：
+        １、能够淘汰早期数据
+        ２、能控制集合大小
+        ３、结构紧凑，插入查找速度快
+    使用：日志处理，临时缓存
+
+    创建固定集合
+        db.createCollection('log',{capped:true,size:10000,max:3})
+        capped:true:表示创建固定集合
+        size:3：表示集合中最多存放多少字节数据
+        max:3:表示集合中最多存放多少个文档
+文件存储
+    文件存储数据库方式
+    １、存储路径：将本地文件所在的路径以字符串存储到数据库中
+        优点：节省数据库空间，从数据库获取存储比较简单
+        缺点：当数据库或者文件发送变化时必须修改数据库存储内容
+    ２、存储文件本身：将文件转换为二进制存储到数据库
+        优点：文件随数据库移动。数据在文件即在
+        缺点：占用数据库空间大，存取效率低
+GridFS文件存储方案
+    目的：更好的帮助存储MongoDB中超过16m的大文件
+    方案解释：在MongoDB中创建两个集合，共同存储文件，一个存储文件信息，一个存储文件内容
+            两个集合相互配合。
+        fs.files:存储文件信息(文件名，大小等)
+        fs.chunks:以二进制存储文件内容
+    存储方式：mongodbfiles -d dbname put file（终端输入）
+                             数据库　　　要存的文件（地址）
+    获取方法：mongofiles -d dbname get file
+        *file 必须是fs.files中filename值（filename：）
+            filename 通过db.fs.files.find() 可以查找到filename（内容的最下面）
+        例如：从数据库中获取文件
+            mongofiles -d grid get ./dict.txt
+    优缺点：
+        优点：存储方便，提供了较好的命令，方便数据库移动
+        缺点：读写效率低，不建议存储小文件
+
+mongo shell 对javaScript支持
+    在mongo shell下可以直接运行JS代码
+
+
+python 模块 -->pythongo第三方模块
+    安装：sudo pip3 install pythongo
+    操作步骤：
+        １、创建mongodb数据库连接对象
+            conn=pythongo.MongoClient('localhost',27017)
+        ２、创建数据库操作对象
+            db=conn.stu
+            或者db=conn['stu']
+        ３、生成集合对象
+            myset=db.class0
+            或者myset=db['class0']
+        ４、通过集合对象操作数据库
+        ５、关闭数据库连接
+            conn.close()
+
+插入操作：
+    insert_one()插入一条文档
+    insert_many()插入多条文档
+    insert()插入一条文档
+    save()插入数据，_id相同时，会替换原有内容
+查找操作：
+    find()
+    功能：查找所有文档
+    参数：同mongo shell find
+    返回：游标对象（包括返回结果）
+    *所有操作符在python中以字符串方式传入参数结构
+    *mongo中　true false null对应python中的true false none
+
+    cursor对象属性：
+    next()获取下一个文档
+    limit()显示前几条文档
+    skip()跳过前几条
+    count()计数
+    sort()排序
+    *调用limit skip sort时，要求游标必须是完整的没取过值的
+
+    find_one()
+    功能：查找一个文档
+    参数：同find()
+    返回：返回返回一个字典（）
+
+修改操作：
+    updtae_one()修改一条文档
+    updtae_many()修改多条文档
+    updtae()
+
+删除操作
+    delete_one()删除一个文档
+    delete_many()删除多个文档
+    remove(query,multi=True)
+            默认删除多个,如果multi=false删除一个
+
+索引操作
+create_index()
+功能：创建索引
+参数：直接写要创建索引的域名（以字符串形式）
+        'name'表示对name创建正向索引
+    以元组的形式写入创建索引键值对
+        [('name':-1)]：表示对name创建逆向索引
+返回：返回索引名
+
+list_indexes()查看索引
+
+drop_index()
+功能：删除一个索引
+参数：索引名称
+
+drop_indexes()删除所有索引
+
+聚合操作
+aggregate([])
+参数：同mongoshell中聚合
+返回值：和find()相同返回一个游标
+
+练习：
+    １、将没有性别域的文档删除
+    ２、给所有文档增加一个域
+        分数取值范围６０－１００（随机）
+        {'chinese':99,'math':89,'English':63}
+    ３、聚合操作，查看所有女生的英语成绩排序，不显示_id项
+
+文件操作
+    binary data:mongodb中二进制格式
+    文件存储步骤：
+    １、连接数据库，生成数据库对象，集合对象
+    ２、选择要存储的文件，以rb方式读取
+    ３、将读取内容转换为mongodb二进制存储方式
+        content=bson.binary.Binary(data)
+        功能：将bytes字串数据转换为Mongo的二进制存储形式
+        参数：要存储的内容
+        返回值：转换后的待存储数据
+    ４、将存储内容放入文档，插入数据库
