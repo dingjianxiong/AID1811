@@ -79,4 +79,80 @@ git 的基本命令
         git diff [file]
     ７、从仓库恢复文件到工作区
         git checkout [文件]
-    
+    ８、文件的移动和删除
+        git mv [移动的文件] 移动到什么位置／（可以修改文件名）
+        git rm [文件]
+        *与add 操作相同，即将文件移动或删除提交到暂存区
+作业：
+    １、总结正则表达式的使用
+    ２、申请github账户
+    ３、httpserver第二版复习
+
+
+版本控制命令
+    １、回到之前的commit id位置
+        git reset --hard HEAD^
+        *HEAD后有几个^，就表示退回几个commit位置
+        *HEAD:表示最新的commit_id
+        *commit_id:表示记录操作的id
+
+        git reset --hard　commit_id（*前七位）
+        *commit_id用前七位即可
+        *选定commit_id表示HEAD指向选定的id，而不是恢复到指定的commit_id版本
+        *会丢弃commit_id后面的id
+    ２、去往之前较新的版本
+        git reflog(查看历史版本记录)
+        *查看后使用git reset --hard即可选择回到某个操作之后的状态
+标签管理
+    什么是标签：即在某个commit_id位置添加快照，保存工作状态，一般用于版本的迭代，和重要的项目节点记录
+    １、创建新的标签
+        git tag v1.0
+        *默认在最新的commit_id处添加标签
+
+        git tag v1.0 [commit_id]
+        *指定某一个commit_id版本
+
+        git tag v1.0 -m "message"
+        *为标签添加信息
+    ２、查看标签
+        git tag
+        *查看所有的标签
+
+        git show v1.2
+        *查看具体标签的信息
+    ３、去往某个标签版本
+        git reset --hard v1.0
+    ４、删除标签
+        git tag -d v1.1
+临时工作区操作
+    １、创建工作区：
+        git stash
+        *对工作区文件的修改进行临时保存    
+    ２、查看已经保存的工作区记录
+        git stash list
+        *最新的保存为{0}以此类推
+    ３、选择应用某个工作区
+        git stash apply stash@{0}
+        *执行命令时，工作区必须为“干净”状态
+    ４、删除保存的工作区
+        git stash drop stash@{0} 删除一个
+        git stash pop　删除最新保存的工作区将其删除
+        git stash clear　删除所有工作区
+
+分支操作
+    什么是分支？
+        分支即每个人获取原有代码，再此基础上创建自己的工作环境，单独开发，不会影响其他分支工作。
+        开发完成后统一合并
+    １、查看当前分支
+        git branch　
+        列出所有项目分支，*的表示当前工作分支
+        
+    ２、分支创建和切换
+        git branch [name]
+        *创建新的分支时，确保当前分支是干净的
+
+        git checkout -b [tom_dev]
+        *创建并切换到分支
+
+        git checkout [djx] 
+        *切换到分支
