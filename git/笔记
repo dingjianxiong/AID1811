@@ -211,3 +211,9 @@ git 的基本命令
     ５、clone远程仓库项目
         获取项目到本地
         git clone tarena@127.0.0.1:/home/tarena/gitrepo/spyder.git
+    ６、从远程仓库获取代码到本地
+        git pull
+        *自动从远程分支拉取代码合并到本地的对应分支
+        （*可以通过　cat 文件名　查看文件的内容）
+            
+        git fetch 
