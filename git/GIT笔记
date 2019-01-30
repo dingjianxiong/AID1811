@@ -221,4 +221,9 @@ git 的基本命令
         *可以通过git branch -r查看拉取的远程分支，
             然后使用git merge命令有选择的合并到本地
         *git branch -a查看所有分支
+
+github使用
+    什么是github：是一个开源项目社区网站。拥有全球最多的开源项目。开发者可以注册网站建立自己的git
+    仓库，然后可以同步管理自己的项目代码。git是github唯一指定的管理工具
+    网站：https://github.com
         
