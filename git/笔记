@@ -191,7 +191,7 @@ git 的基本命令
         *　HTTP/HTTPS协议:
             例如：http://example.com/project.git
 
-    ３、添加远程主机仓库：ssh
+    ３、添加远程主机仓库：ssh协议
         git remote add origin tarena@127.0.0.1:/home/tarena/gitrepo/spyder.git
             origin：远程主机的名字，可修改
                 *删除远程主机：git remote rm [远程主机名]
@@ -202,7 +202,12 @@ git 的基本命令
     ４、push将本地分支推送到远程
         git push -u origin master
             *-u表示本地master和远程master建立追踪关系，这样后面本地分支修改后再向远程推送
-                可以省略分支名　
+                可以省略分支名　例如：git push
             例如：向远程推送标签
                 git push origin v1.0　某一个标签
                 git push origin --tags　所有标签
+        删除某一个远程分支
+        git push origin --delete tom_dev
+    ５、clone远程仓库项目
+        获取项目到本地
+        git clone tarena@127.0.0.1:/home/tarena/gitrepo/spyder.git
